@@ -1,0 +1,23 @@
+<tr>
+    {{#each columns as col}}
+    <Column bind:source="item" settings="{{col}}" rowedit="{{mode}}"/>
+    {{/each}}
+</tr>
+<script>
+    import Column from './Column.html';
+    export default {
+        data(){
+            return {
+                rowedit:false,
+                tableedit:false
+            }
+        },
+        computed:{
+            editable: (rowedit, tableedit) => { return tableedit || rowedit }
+        },
+        components:{
+            Column
+        },
+
+    }
+</script>

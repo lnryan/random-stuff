@@ -1,3 +1,17 @@
 <td>
-    <b>I am</b>
+    {{#if mode=='edit'}}
+        <input bind:value="source[settings.fieldname]" />
+    {{else}}
+        {{source[settings.fieldname]}}
+    {{/if}}
 </td>
+<script>
+    export default {
+        data(){
+            return {
+                mode:'display'
+            }
+        }
+    }
+</script>
+

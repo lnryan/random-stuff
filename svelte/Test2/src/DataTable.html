@@ -1,0 +1,60 @@
+<h3>{{title}}</h3>
+<table>
+    <thead>
+        <tr colspan="{{ccount}}">
+            <button on:click="toggleedit()">{{#if !editable}}Display{{else}}Edit{{/if}}</button>
+        </tr>
+        <tr>
+        {{#each columns as col}}
+            <th>{{col.label}}</th>
+        {{/each}}
+        </tr>
+    </thead>
+    <tbody>
+    {{#each data as item}}
+        <Row bind:item columns="{{columns}}" :editable />
+    {{/each}}
+    </tbody>
+</table>
+<script>
+    import Row from './Row.html';
+
+    export default {
+        data(){
+            return {
+                editable:false,
+                columns:[],
+            }
+        },
+        computed:{
+            ccount:columns=>columns.length
+        },
+        methods:{
+            toggleedit(){
+                console.log('Toggling!',this.get('editable'));
+                this.set({ editable:!this.get('editable') });
+            }
+        },
+        components:{
+            Row
+        },
+        oncreate(){
+            var cols = this.get('columns');
+            if(!cols||cols.length==0){
+                cols = [];
+                console.warn('No column settings were passed, using values from first row');
+                try {
+                    Object.keys(this.get('data')[0]).forEach(cp => {
+                        cols.push({
+                            fieldname:cp,
+                            label:cp.substr(0,1).toUpperCase()+cp.substr(1)
+                        });
+                    });
+                    this.set({ columns: cols });
+                }catch(err){
+                    console.warn('Invalid data. An array of objects was expected',err);
+                }
+            }
+        }
+    }
+</script>
