@@ -1,7 +1,13 @@
 <tr>
     {{#each columns as col}}
-    <Column bind:source="item" settings="{{col}}" rowedit="{{mode}}"/>
+    <Column bind:source="item" settings="{{col}}" :editable />
     {{/each}}
+    <td>
+        {{#if !tableedit}}
+        <button on:click="toggleedit()">{{#if !editable}}Edit{{else}}Display{{/if}}</button>
+        {{/if}}
+    </td>
+
 </tr>
 <script>
     import Column from './Column.html';
@@ -18,6 +24,11 @@
         components:{
             Column
         },
+        methods:{
+            toggleedit(){
+                this.set({ rowedit:!this.get('rowedit') });
+            }
+        }
 
     }
 </script>

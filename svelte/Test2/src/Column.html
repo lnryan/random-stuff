@@ -1,5 +1,5 @@
 <td>
-    {{#if mode=='edit'}}
+    {{#if editable}}
         <input bind:value="source[settings.fieldname]" />
     {{else}}
         {{source[settings.fieldname]}}
@@ -9,7 +9,7 @@
     export default {
         data(){
             return {
-                mode:'display'
+                editable:false
             }
         }
     }

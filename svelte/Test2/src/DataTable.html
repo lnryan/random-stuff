@@ -1,18 +1,18 @@
 <h3>{{title}}</h3>
 <table>
     <thead>
-        <tr colspan="{{ccount}}">
-            <button on:click="toggleedit()">{{#if !editable}}Display{{else}}Edit{{/if}}</button>
-        </tr>
         <tr>
         {{#each columns as col}}
             <th>{{col.label}}</th>
         {{/each}}
+        <th>
+            <button on:click="toggleedit()">{{#if !editable}}Edit{{else}}Display{{/if}}</button>
+        </th>
         </tr>
     </thead>
     <tbody>
     {{#each data as item}}
-        <Row bind:item columns="{{columns}}" :editable />
+        <Row bind:item columns="{{columns}}" tableedit="{{editable}}" />
     {{/each}}
     </tbody>
 </table>
