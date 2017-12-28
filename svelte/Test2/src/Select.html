@@ -1,1 +1,17 @@
-<input bind:value="value" />
+<select bind:value >
+    {{#each settings.options as option}}
+    <option value="{{okey(option)}}">{{ovalue(option)}}</option>
+    {{/each}}
+</select>
+<script>
+    export default {
+        helpers:{
+            okey(o){
+                return (typeof o=='object'&&o.hasOwnProperty('key'))?o.key:o;
+            },
+            ovalue(o){
+                return (typeof o=='object'&&o.hasOwnProperty('value'))?o.value:o;
+            }
+        }
+    }
+</script>

@@ -40,19 +40,24 @@
         },
         oncreate(){
             var cols = this.get('columns');
+            var cfg = this.get('settings');
             if(!cols||cols.length==0){
-                cols = [];
-                console.warn('No column settings were passed, using values from first row');
-                try {
-                    Object.keys(this.get('data')[0]).forEach(cp => {
-                        cols.push({
-                            fieldname:cp,
-                            label:cp.substr(0,1).toUpperCase()+cp.substr(1)
+                if(cfg.hasOwnProperty('columns')){
+                    cols = cfg.columns; this.set({columns: cols })
+                }else {
+                    cols = [];
+                    console.warn('No column settings were passed, using values from first row');
+                    try {
+                        Object.keys(this.get('data')[0]).forEach(cp => {
+                            cols.push({
+                                fieldname: cp,
+                                label: cp.substr(0, 1).toUpperCase() + cp.substr(1)
+                            });
                         });
-                    });
-                    this.set({ columns: cols });
-                }catch(err){
-                    console.warn('Invalid data. An array of objects was expected',err);
+                        this.set({columns: cols});
+                    } catch (err) {
+                        console.warn('Invalid data. An array of objects was expected', err);
+                    }
                 }
             }
         }

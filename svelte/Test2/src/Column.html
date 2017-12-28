@@ -1,20 +1,23 @@
 <td>
     {{#if editable}}
         <:Component { fieldtype } bind:value="source[settings.fieldname]" settings="{{settings}}"/>
-    {{else}}
+    {{elseif displayable}}
         {{source[settings.fieldname]}}
     {{/if}}
 </td>
 <script>
     import Text from './Text.html';
-    import Data from './Date.html';
+    import Date from './Date.html';
     import Number from './Number.html';
     import Select from './Select.html';
 
     export default {
         data(){
             return {
-                editable:false
+                editable:false,
+                appendable:false,
+                sortable:false,
+                filterable:false
             }
         },
         components:{
@@ -24,6 +27,9 @@
             Select
         },
         computed:{
+            displayable:(source,settings)=> {
+                return (source.hasOwnProperty(settings.fieldname)&&source[settings.fieldname]!=null);
+            },
             fieldtype:settings=> {
                 var ft = Text;
                 if (settings.type) {
