@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JavaScriptLibraryMappings">
+    <excludedPredefinedLibrary name="tryouts/svelte/DataTable/node_modules" />
+    <excludedPredefinedLibrary name="tryouts/svelte/NLP-to-Graph/node_modules" />
+  </component>
+</project>
