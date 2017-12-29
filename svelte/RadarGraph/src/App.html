@@ -36,24 +36,25 @@
                         {fieldname: "analysis", label: "Analysis", type: "number"},
                     ]
                 },
-                computed:{
-                    facets:table_settings=> {
-                        console.log('checking columns',table_settings.columns);
-                        var cs = table_settings.columns;
-                        var ms = [];
-                        for(var c in cs){
-                            if(c!=0) {
-                                ms.push(cs[c].label);
-                            }
-                        }
-                        return ms;
-                    }
-                },
+
                 data: [
                     {name: 'Stanley', java: 0, html: 9, css: 5, javascript: 8, analysis: 4},
                     {name: 'Maria', java: 0, html: 9, css: 5, javascript: 8, analysis: 9},
                     {name: 'Jebediah', java: 9, html: 5, css: 1, javascript: 4, analysis: 2}
                 ]
+            }
+        },
+        computed:{
+            facets:table_settings=> {
+                console.log('checking columns',table_settings.columns);
+                var cs = table_settings.columns;
+                var ms = [];
+                for(var c in cs){
+                    if(c!=0) {
+                        ms.push(cs[c].label);
+                    }
+                }
+                return ms;
             }
         },
         components:{
