@@ -2,7 +2,7 @@
     <DataTable settings="{{table_settings}}" bind:data editable=true title="Team Skills" />
 </div>
 <div id="radartool">
-    <RadarTool :data  bind:facets="facets" />
+    <RadarTool :data  :facets />
 </div>
 <style>
 	h1 {
@@ -37,12 +37,13 @@
                     ]
                 },
                 computed:{
-                    facets:columns=>{
-                        console.log('checking columns',columns);
+                    facets:table_settings=> {
+                        console.log('checking columns',table_settings.columns);
+                        var cs = table_settings.columns;
                         var ms = [];
-                        for(var c in columns){
+                        for(var c in cs){
                             if(c!=0) {
-                                ms.push(columns[c].label);
+                                ms.push(cs[c].label);
                             }
                         }
                         return ms;
