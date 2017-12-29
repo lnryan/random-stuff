@@ -1,0 +1,33 @@
+<h1>Hello {{name}}!</h1>
+<DataTable title="People" bind:data="items" :columns editable=false />
+<style>
+	h1 {
+		color: purple;
+	}
+</style>
+<script>
+    import DataTable from './DataTable.html';
+
+    export default {
+        components:{
+            DataTable
+        },
+        data(){
+            return {
+                items:[
+                    { name: 'Lindsay', age:37 },
+                    { name: 'Jason', age:10 },
+                    { name: 'Stephen', age:45,birthday:null },
+                    { name: 'Karen', age:36, birthday:null },
+                    { name: 'Ann', age: 22, birthday:null }
+                ],
+                columns:[
+                    { label:"Name", fieldname:"name", type:"text" },
+                    { label:"Age", fieldname:"age",type:"number"},
+                    { label:"Birthday", fieldname:"birthday", type:"date"}
+                ]
+            }
+        }
+
+    }
+</script>

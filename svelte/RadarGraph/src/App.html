@@ -1,0 +1,63 @@
+<div id="datatable">
+    <DataTable settings="{{table_settings}}" bind:data editable=true title="Team Skills" />
+</div>
+<div id="radartool">
+    <RadarTool :data  bind:facets="facets" />
+</div>
+<style>
+	h1 {
+		color: purple;
+	}
+    #datatable {
+        position:absolute;
+        top:50%;
+
+    }
+    #radartool {
+        position:absolute;
+        top:0%;
+        height:50%;
+    }
+</style>
+<script>
+    import RadarTool from './RadarTool.html';
+    import DataTable from '../../DataTable/src/DataTable.html';
+
+    export default {
+        data(){
+            return {
+                table_settings: {
+                    columns: [
+                        {fieldname: "name", label: "Name", type: "text"},
+                        {fieldname: "java", label: "Java", type: "number"},
+                        {fieldname: "html", label: "HTML", type: "number"},
+                        {fieldname: "css", label: "CSS", type: "number"},
+                        {fieldname: "javascript", label: "Javascript", type: "number"},
+                        {fieldname: "analysis", label: "Analysis", type: "number"},
+                    ]
+                },
+                computed:{
+                    facets:columns=>{
+                        console.log('checking columns',columns);
+                        var ms = [];
+                        for(var c in columns){
+                            if(c!=0) {
+                                ms.push(columns[c].label);
+                            }
+                        }
+                        return ms;
+                    }
+                },
+                data: [
+                    {name: 'Stanley', java: 0, html: 9, css: 5, javascript: 8, analysis: 4},
+                    {name: 'Maria', java: 0, html: 9, css: 5, javascript: 8, analysis: 9},
+                    {name: 'Jebediah', java: 9, html: 5, css: 1, javascript: 4, analysis: 2}
+                ]
+            }
+        },
+        components:{
+            DataTable,
+            RadarTool
+        }
+    }
+</script>
