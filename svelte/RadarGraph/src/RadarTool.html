@@ -5,17 +5,25 @@
         <b>Increment</b><input id="incr" type="number" bind:value="incr" max="100" width="10px" /><br />
     </div>
     <div id="RadarChart">
-        <svg id="RadarSVG" width="400" height="400">
+        <svg id="RadarSVG" width="500" height="500" viewbox="-250 -250 250 250">
             <!-- create circles for the scale -->
             {{#each marks as mark}}
-            <circle class="marker" cx="200" cy="200" r="{{magnify(mark)}}" stroke-width="0.5" />
+            <circle class="marker" cx="{{centerx}}" cy="{{centery}}" r="{{magnify(mark)}}" stroke-width="0.5" />
             {{/each}}
+            <defs>
+                <g id="spoke" class="spoke" style="background:transparent">
+                    <path fill="transparent" stroke="#111" stroke-width="1" d="M{{centerx}},{{centery}} l{{magnify(range)}},0" />
+                    <!-- <use xlink:href="#icon-photo" width="20" height="20"/>-->
+                </g>
+            </defs>
 
-            <text x="20" y="20">{{JSON.stringify(facets)}}</text>
-            <!-- create spokes foreach facet to be measured
-            {{#each facets as facet}}
-                <text x=10 y={{nexty()}}>{{facet}}</text>
-            {{/each}}-->
+            <!-- create spokes foreach facet to be measured-->
+            {{#each facets as facet, f}}
+                <g transform="rotate({{f*angle}},{{centerx}},{{centery}})">
+                    <text x={{centerx+magnify(range)}} y={{centery-range}} transform="rotate(90,{{centerx+magnify(range)}},{{centery}})">{{facet}}</text>
+                    <use xlink:href="#spoke" />
+                </g>
+            {{/each}}
         </svg>
     </div>
 </div>
@@ -42,23 +50,28 @@
             return {
                 range:10,
                 incr:1,
+                scale:20,
                 facets:[],
-                data:[]
+                data:[],
+                centerx:250,
+                centery:250
             }
         },
         helpers:{
-            nexty(){
-                var n = get('n');
-                if(!n) n = 10;
-                else n+=10;
-                set({ n: n });
-                return n;
+            //A = X + D/(sqrt(1+m^2))
+            //B = Y + M*D/(sqrt(1+m*m))
+            farx(x1,angle,index){
+                return x1 + (100/Math.sqrt(1+Math.pow((angle*index),2)));
             },
-            magnify(marker){
-                return marker*10;
+            fary(y1,angle,index){
+                return y1 + (((angle*index)*100)/Math.sqrt(1+Math.pow((angle*index),2)));
             }
         },
         computed:{
+            angle:facets=>{
+                var n = facets.length;
+                return 360/n;
+            },
             marks:(range,incr)=> {
                 var xs = [];
                 var x=0;
@@ -67,6 +80,12 @@
                     x+=incr;
                 }
                 return xs;
+            },
+            magnify:(scale)=>{
+                return (factor)=>{ return factor * scale; }
+            },
+            next_angle:(angle)=>{
+                return (index)=>{ return index*angle; }
             }
         }
     }
