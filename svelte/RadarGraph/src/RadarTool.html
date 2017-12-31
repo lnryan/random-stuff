@@ -19,10 +19,14 @@
 
             <!-- create spokes foreach facet to be measured-->
             {{#each facets as facet, f}}
-                <g transform="rotate({{f*angle}},{{centerx}},{{centery}})">
-                    <text x={{centerx+magnify(range)}} y={{centery-range}} transform="rotate(90,{{centerx+magnify(range)}},{{centery}})">{{facet}}</text>
+                <g transform="rotate({{angle(f)}},{{centerx}},{{centery}})">
+                    <text class="facet-label" x={{centerx+magnify(range)}} y={{centery-range}} text-anchor="middle" transform="rotate(90,{{centerx+magnify(range)}},{{centery-range}})">{{facet}}</text>
                     <use xlink:href="#spoke" />
                 </g>
+            {{/each}}
+
+            {{#each data as d}}
+                <polygon points="{{facet_points(d)}}" style="fill:transparent;stroke:purple;stroke-width:2" />
             {{/each}}
         </svg>
     </div>
@@ -57,22 +61,15 @@
                 centery:250
             }
         },
-        helpers:{
-            //A = X + D/(sqrt(1+m^2))
-            //B = Y + M*D/(sqrt(1+m*m))
-            farx(x1,angle,index){
-                return x1 + (100/Math.sqrt(1+Math.pow((angle*index),2)));
-            },
-            fary(y1,angle,index){
-                return y1 + (((angle*index)*100)/Math.sqrt(1+Math.pow((angle*index),2)));
-            }
-        },
         computed:{
-            angle:facets=>{
-                var n = facets.length;
-                return 360/n;
+            base_angle:facets=>{
+                if(!facets||!facets.length||facets.length==0){
+                    console.warn("Can't compute section angle without at least 1 facet",{facets:facets});
+                    return 360;
+                }
+                else return 360/facets.length;
             },
-            marks:(range,incr)=> {
+            marks:(range,incr)=> { //marks = number of concentric circles shown
                 var xs = [];
                 var x=0;
                 while(x<=range){
@@ -81,12 +78,16 @@
                 }
                 return xs;
             },
-            magnify:(scale)=>{
+            magnify:(scale)=>{ //TODO - include scale as a 'toolbox' control on UI
                 return (factor)=>{ return factor * scale; }
             },
-            next_angle:(angle)=>{
-                return (index)=>{ return index*angle; }
-            }
+            angle:(base_angle)=>{
+                return (index)=>{ return index*base_angle; }
+            },
+            facet_points:(facets)=>{
+                return (data_rec)=>{return "200,10 250,190 160,210"}
+            },
+
         }
     }
 </script>

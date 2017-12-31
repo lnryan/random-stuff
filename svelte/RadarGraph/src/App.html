@@ -1,8 +1,8 @@
 <div id="datatable">
-    <DataTable settings="{{table_settings}}" bind:data editable=true title="Team Skills" />
+    <DataTable bind:settings="{{table_settings}}" bind:data editable=true title="Team Skills" />
 </div>
 <div id="radartool">
-    <RadarTool :data  :facets />
+    <RadarTool bind:data  bind:facets />
 </div>
 <style>
 	h1 {
