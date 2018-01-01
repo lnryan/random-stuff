@@ -1,26 +1,35 @@
 <div id="datatable">
-    <DataTable bind:settings="{{table_settings}}" bind:data editable=true title="Team Skills" />
+    <DataTable bind:settings="table_settings" bind:data editable=true title="Team Skills" />
 </div>
 <div id="radartool">
+    <!--<RadarStatic />-->
     <RadarTool bind:data  bind:facets />
 </div>
 <style>
 	h1 {
 		color: purple;
 	}
+    #radartool{
+        position: absolute;
+        display:block;
+        top: 0%;
+        left: 0%;
+        width: 100%;
+        height: 50%;
+        overflow: scroll;
+        border: #3536ff 1px;
+    }
     #datatable {
         position:absolute;
         top:50%;
+        width:100%;
+        overflow: scroll;
 
-    }
-    #radartool {
-        position:absolute;
-        top:0%;
-        height:50%;
     }
 </style>
 <script>
     import RadarTool from './RadarTool.html';
+    import RadarStatic from './RadarStatic.html';
     import DataTable from '../../DataTable/src/DataTable.html';
 
     export default {
@@ -46,7 +55,6 @@
         },
         computed:{
             facets:table_settings=> {
-                console.log('checking columns',table_settings.columns);
                 var cs = table_settings.columns;
                 var ms = [];
                 for(var c in cs){
@@ -59,7 +67,8 @@
         },
         components:{
             DataTable,
-            RadarTool
+            RadarTool,
+            RadarStatic
         }
     }
 </script>

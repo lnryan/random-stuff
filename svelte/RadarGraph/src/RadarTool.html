@@ -1,75 +1,74 @@
-<div width="100%">
+<div>
     <div id="RadarInputs">
         <h1>Radar Worksheet</h1>
+        <b>Size</b><input id="size" type="number" bind:value="size" min="50" max="1000" step="50" /><br />
         <b>Range</b><input id="range" type="number" bind:value="range" max="100" width="10px" /><br />
         <b>Increment</b><input id="incr" type="number" bind:value="incr" max="100" width="10px" /><br />
+        <output>ViewBox = x,y : {{-1*size/2}}, w,h : {{size}}</output>
     </div>
-    <div id="RadarChart">
-        <svg id="RadarSVG" width="500" height="500" viewbox="-250 -250 250 250">
-            <!-- create circles for the scale -->
-            {{#each marks as mark}}
-            <circle class="marker" cx="{{centerx}}" cy="{{centery}}" r="{{magnify(mark)}}" stroke-width="0.5" />
+    <div id="RadarChart" style="position:absolute; display:block; width:{{size+50}}px; left:25%; height:{{size+50}}px;">
+        <svg viewBox="{{-1*size/2}} {{-1*size/2}} {{size}} {{size}}" > <!--this centers on (0,0) for easier math-->
+            {{#each rings as ring}}
+                <circle class="rings" cx="{{centerx}}" cy="{{centery}}" r="{{magnify(ring)}}" stroke-width="0.5" />
             {{/each}}
-            <defs>
-                <g id="spoke" class="spoke" style="background:transparent">
-                    <path fill="transparent" stroke="#111" stroke-width="1" d="M{{centerx}},{{centery}} l{{magnify(range)}},0" />
-                    <!-- <use xlink:href="#icon-photo" width="20" height="20"/>-->
-                </g>
-            </defs>
 
-            <!-- create spokes foreach facet to be measured-->
             {{#each facets as facet, f}}
-                <g transform="rotate({{angle(f)}},{{centerx}},{{centery}})">
-                    <text class="facet-label" x={{centerx+magnify(range)}} y={{centery-range}} text-anchor="middle" transform="rotate(90,{{centerx+magnify(range)}},{{centery-range}})">{{facet}}</text>
-                    <use xlink:href="#spoke" />
-                </g>
+                <line class="spoke" x1="{{fx(centerx,f)}}" y1="{{fy(centery,f)}}" x2="{{fx(range,f)}}" y2="{{fy(range,f)}}" />
+                <text class="facet-label" x={{fx(parseInt(range)+1,f)}} y={{fy(parseInt(range)+1,f)}} text-anchor="middle" >
+                    {{facet}}
+                </text>
+            {{/each}}
+            <!-- create a polygon for each data record, with points on respective spoke for each facet -->
+            {{#each data as d,i}}
+                <polygon points="{{points(d)}}" style="fill:transparent;stroke:{{colors[i]}};stroke-width:2" />
             {{/each}}
 
-            {{#each data as d}}
-                <polygon points="{{facet_points(d)}}" style="fill:transparent;stroke:purple;stroke-width:2" />
-            {{/each}}
         </svg>
     </div>
 </div>
 <style>
     #RadarChart {
-        position:absolute;
-        left:500px;
-        width:100%;
-        height:100%;
+        top:0px;
     }
     #RadarInputs {
-        position:absolute;
-        left:0%;
-        width:50%;
+        top:0px;
+        left:0px;
+        width:25%;
     }
-    circle.marker {
+    line.spoke {
+        stroke:blue;
+        stroke-width:1px;
+        fill:transparent;
+    }
+    circle.rings {
         stroke:gray;
-        fill:none;
+        fill:transparent;
     }
 </style>
 <script>
     export default {
         data(){
             return {
+                size:400,
                 range:10,
                 incr:1,
                 scale:20,
                 facets:[],
                 data:[],
-                centerx:250,
-                centery:250
+                centerx:0,
+                centery:0,
+                colors:["red","orange","yellow","green","blue","purple","grey","navy"]
             }
         },
         computed:{
-            base_angle:facets=>{
+            base_angle:facets=>{ //in radians!!
                 if(!facets||!facets.length||facets.length==0){
                     console.warn("Can't compute section angle without at least 1 facet",{facets:facets});
-                    return 360;
+                    return 2*Math.PI;
                 }
-                else return 360/facets.length;
+                else return 2*Math.PI/(facets.length);
             },
-            marks:(range,incr)=> { //marks = number of concentric circles shown
+            rings:(range,incr)=> { //rings = number of concentric circles shown
                 var xs = [];
                 var x=0;
                 while(x<=range){
@@ -81,11 +80,36 @@
             magnify:(scale)=>{ //TODO - include scale as a 'toolbox' control on UI
                 return (factor)=>{ return factor * scale; }
             },
-            angle:(base_angle)=>{
-                return (index)=>{ return index*base_angle; }
+            fx:(centerx,angle,magnify)=>{
+                return (distance,index)=>{
+                    console.log('fx: ',angle(index),Math.sin(angle(index)).toFixed(2));
+                    return centerx + magnify(distance)*Math.sin(angle(index)).toFixed(2);
+                }
             },
-            facet_points:(facets)=>{
-                return (data_rec)=>{return "200,10 250,190 160,210"}
+            fy:(centery,angle,magnify)=>{
+                return (distance,index)=>{
+                    console.log('fy: ',angle(index),Math.cos(angle(index)).toFixed(2));
+                    return centery + magnify(distance)*Math.cos(angle(index)).toFixed(2);
+                }
+            },
+            angle:(base_angle)=>{
+                return (index)=>{
+                    return (parseInt(index)+1)*base_angle.toFixed(2);
+                }
+            },
+            points:(facets,fx,fy,magnify)=>{
+                return (data_rec)=>{
+
+                    var point_list = "";
+                    for(var f in facets){
+                        console.log(facets[f],f);
+                        var val = data_rec[facets[f].toLowerCase()];
+                        if(!val) val = 0;
+                        point_list += fx(val,f)+","+fy(val,f)+" ";
+                    }
+                    console.log("polygon",point_list,data_rec);
+                    return point_list;
+                }
             },
 
         }
