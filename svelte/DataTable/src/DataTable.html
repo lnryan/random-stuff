@@ -30,7 +30,7 @@
                 <button on:click="togglecolumns()">Columns</button>
                 {{/if}}
                 {{#if appendable}}
-                <button on:click="toggleedit()">Add Row</button>
+                <button on:click="add('data')">Add</button>
                 {{/if}}
 
             </th>
@@ -42,8 +42,14 @@
         </tr>
     </thead>
     <tbody>
-    {{#each data as item}}
-        <Row bind:item :columns tableedit="{{edit}}" :editable />
+    {{#each data as item,i}}
+        <Row bind:item :columns tableedit="{{edit}}" :editable >
+            <span slot='row_buttons'>
+            {{#if appendable}}
+                <button on:click="remove('data',i)">Remove</button>
+            {{/if}}
+            </span>
+        </Row>
     {{/each}}
     </tbody>
 </table>
@@ -83,6 +89,12 @@
                     for(var k in newd){ newd[k]=""; }
                 }
                 data[source].push(newd);
+                this.set(data);
+            },
+            remove(source,index){
+                var data = {};
+                data[source] = this.get(source);
+                data[source].splice(index,1);
                 this.set(data);
             }
         },

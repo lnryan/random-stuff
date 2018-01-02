@@ -6,6 +6,7 @@
         {{#if !tableedit&&editable}}
         <button on:click="toggleedit()">{{#if !edit}}Edit{{else}}Display{{/if}}</button>
         {{/if}}
+        <slot name="row_buttons"></slot>
     </td>
 
 </tr>
