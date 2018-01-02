@@ -1,5 +1,5 @@
 <td>
-    {{#if editable}}
+    {{#if edit}}
         <:Component { fieldtype } bind:value="source[settings.fieldname]" settings="{{settings}}"/>
     {{elseif displayable}}
         {{source[settings.fieldname]}}
@@ -14,10 +14,8 @@
     export default {
         data(){
             return {
+                edit:false,
                 editable:false,
-                appendable:false,
-                sortable:false,
-                filterable:false
             }
         },
         components:{

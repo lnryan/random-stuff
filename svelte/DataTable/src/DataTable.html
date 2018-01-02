@@ -1,38 +1,89 @@
 <h3>{{title}}</h3>
+<div class="{{(display_columns)?'show':'hide'}}">
+    <table>
+        <thead>
+            <tr>
+                <th>Column Label</th><th>Column Name</th><th>Type</th>
+                <th><button on:click="add('columns')" >Add</button><button on:click="togglecolumns()">Close</button></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each columns as col,c}}
+            <tr>
+                <td><input type="text" bind:value="col.label" /></td>
+                <td><input type="text" bind:value="col.fieldname" /></td>
+                <td><input type="text" bind:value="col.type" /></td>
+                <td><button on:click="remove('columns',c)">Remove</button></td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
 <table>
     <thead>
+        <tr>
+            <th colspan="{{ccount}}">
+                {{#if editable}}
+                <button on:click="toggleedit()">{{#if !edit}}Edit{{else}}Display{{/if}}</button>
+                {{/if}}
+                {{#if extensible}}
+                <button on:click="togglecolumns()">Columns</button>
+                {{/if}}
+                {{#if appendable}}
+                <button on:click="toggleedit()">Add Row</button>
+                {{/if}}
+
+            </th>
+        </tr>
         <tr>
         {{#each columns as col}}
             <th>{{col.label}}</th>
         {{/each}}
-        <th>
-            <button on:click="toggleedit()">{{#if !editable}}Edit{{else}}Display{{/if}}</button>
-        </th>
         </tr>
     </thead>
     <tbody>
     {{#each data as item}}
-        <Row bind:item columns="{{columns}}" tableedit="{{editable}}" />
+        <Row bind:item :columns tableedit="{{edit}}" :editable />
     {{/each}}
     </tbody>
 </table>
+<style>
+    .show{ display:block; }
+    .hide{ display:none; }
+</style>
 <script>
     import Row from './Row.html';
 
     export default {
         data(){
             return {
+                edit:false,
                 editable:false,
+                extensible:false, //can change data structure
+                appendable:false, //can add data records
+                display_columns:false,
                 columns:[],
             }
         },
         computed:{
-            ccount:columns=>columns.length
+            ccount:columns=>(columns)?columns.length:0
         },
         methods:{
             toggleedit(){
-                console.log('Toggling!',this.get('editable'));
-                this.set({ editable:!this.get('editable') });
+                this.set({ edit:!this.get('edit') });
+            },
+            togglecolumns(){
+                this.set({display_columns :!this.get('display_columns')});
+            },
+            add(source){
+                var data = {};
+                data[source] = this.get(source);
+                var newd = Object.assign({},data[source][0]);
+                if(newd) {
+                    for(var k in newd){ newd[k]=""; }
+                }
+                data[source].push(newd);
+                this.set(data);
             }
         },
         components:{
@@ -44,6 +95,11 @@
             if(!cols||cols.length==0){
                 if(cfg.hasOwnProperty('columns')){
                     cols = cfg.columns; this.set({columns: cols })
+                    this.observe('columns',columns=>{
+                        var settings = this.get('settings');
+                        settings.columns = columns;
+                        this.set({ settings:settings });
+                    });
                 }else {
                     cols = [];
                     console.warn('No column settings were passed, using values from first row');
@@ -57,6 +113,15 @@
                         this.set({columns: cols});
                     } catch (err) {
                         console.warn('Invalid data. An array of objects was expected', err);
+                    }
+                }
+            }
+            if(cfg){
+                for(var c in cfg){
+                    if(c!='columns'){
+                        var s = {};
+                        s[c] = cfg[c];
+                        this.set(s);
                     }
                 }
             }

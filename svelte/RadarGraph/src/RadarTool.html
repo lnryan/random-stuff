@@ -20,9 +20,8 @@
             {{/each}}
             <!-- create a polygon for each data record, with points on respective spoke for each facet -->
             {{#each data as d,i}}
-                <polygon points="{{points(d)}}" style="fill:transparent;stroke:{{colors[i]}};stroke-width:2" />
+                <polygon points="{{points(d)}}" style="fill:{{colors[i]}};fill-opacity:0.2;stroke:{{colors[i]}};stroke-width:1" />
             {{/each}}
-
         </svg>
     </div>
 </div>
@@ -82,13 +81,11 @@
             },
             fx:(centerx,angle,magnify)=>{
                 return (distance,index)=>{
-                    console.log('fx: ',angle(index),Math.sin(angle(index)).toFixed(2));
                     return centerx + magnify(distance)*Math.sin(angle(index)).toFixed(2);
                 }
             },
             fy:(centery,angle,magnify)=>{
                 return (distance,index)=>{
-                    console.log('fy: ',angle(index),Math.cos(angle(index)).toFixed(2));
                     return centery + magnify(distance)*Math.cos(angle(index)).toFixed(2);
                 }
             },
@@ -102,12 +99,10 @@
 
                     var point_list = "";
                     for(var f in facets){
-                        console.log(facets[f],f);
                         var val = data_rec[facets[f].toLowerCase()];
                         if(!val) val = 0;
                         point_list += fx(val,f)+","+fy(val,f)+" ";
                     }
-                    console.log("polygon",point_list,data_rec);
                     return point_list;
                 }
             },

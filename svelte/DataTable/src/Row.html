@@ -1,10 +1,10 @@
 <tr>
     {{#each columns as col}}
-    <Column bind:source="item" settings="{{col}}" :editable />
+    <Column bind:source="item" settings="{{col}}" :edit :editable />
     {{/each}}
     <td>
-        {{#if !tableedit}}
-        <button on:click="toggleedit()">{{#if !editable}}Edit{{else}}Display{{/if}}</button>
+        {{#if !tableedit&&editable}}
+        <button on:click="toggleedit()">{{#if !edit}}Edit{{else}}Display{{/if}}</button>
         {{/if}}
     </td>
 
@@ -14,12 +14,13 @@
     export default {
         data(){
             return {
+                editable:false,
                 rowedit:false,
                 tableedit:false
             }
         },
         computed:{
-            editable: (rowedit, tableedit) => { return tableedit || rowedit }
+            edit: (editable, rowedit, tableedit) => { return editable && (tableedit || rowedit) }
         },
         components:{
             Column

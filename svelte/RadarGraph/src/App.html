@@ -1,5 +1,5 @@
 <div id="datatable">
-    <DataTable bind:settings="table_settings" bind:data editable=true title="Team Skills" />
+    <DataTable bind:settings="table_settings" bind:data title="Team Skills" />
 </div>
 <div id="radartool">
     <!--<RadarStatic />-->
@@ -36,6 +36,8 @@
         data(){
             return {
                 table_settings: {
+                    extensible:true,
+                    editable:true,
                     columns: [
                         {fieldname: "name", label: "Name", type: "text"},
                         {fieldname: "java", label: "Java", type: "number"},
