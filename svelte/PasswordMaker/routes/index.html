@@ -1,0 +1,155 @@
+<:Head>
+    <title>Password Generator</title>
+</:Head>
+<h2>
+    Welcome to your handy password generator <button on:click="get_words()">No Joy!</button>
+</h2>
+<div id="options">
+    <label>how many suggestions?</label><input type="number" bind:value="suggestions" min="1"  max="99" step="5" minlength="1" maxlength="2"  />
+    <label>Minimum Length</label><input type="number" bind:value="pw_min" minlength="1" maxlength="3" min="4" max="64" />
+    <label>Maximum Length</label><input type="number" bind:value="pw_max" minlength="1" maxlength="3" min="4" max="64" />
+    <label>Numbers between words</label><input type="checkbox" bind:checked="infixnum">
+    <h3>Complexity Requirements</h3>
+    <em>describe your password rules. </em>
+    <table>
+        <thead>
+            <tr><th>Type</th><th>Allowed</th><th>Required</th><th>As Cummulative Complexity</th><th>Not Allowed</th></tr>
+        </thead>
+        <tbody>
+            {{#each complexities as complexity}}
+            <tr>
+                <th>{{complexity.type}}</th>
+                <th><input type="radio" bind:group="complexity.requirement" value="allowed" /></th>
+                <th><input type="radio" bind:group="complexity.requirement" value="required" /></th>
+                <th><input type="radio" bind:group="complexity.requirement" value="cummulative" /></th>
+                <th><input type="radio" bind:group="complexity.requirement" value="notallowed" /></th>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+<div id="suggestions">
+    {{#each (passwords || []) as w}}
+    <div>{{w}}</div>
+    {{/each}}
+</div>
+<script>
+    export default {
+        data(){
+            return {
+                infixnum:true,
+                suggestions:10,
+                pw_min:8,
+                pw_max:16,
+                threshold:3,
+                complexities:[
+                    { type:'lowercase',requirement:'allowed'},
+                    { type:'uppercase',requirement:'allowed'},
+                    { type:'mixed case',requirement:'allowed'},
+                    { type:'numbers',requirement:'allowed'},
+                    { type:'special characters',requirement:'allowed'},
+                ],
+                specials:`!"#$%&'()*+,-./:;<=>?@[\]^_{|}~\``.split('')
+            }
+        },
+        computed:{
+            random_api_url:(pw_min,pw_max,suggestions)=>{
+                var n = 2 * suggestions;
+                var l = Math.round(pw_min/2);
+                var h = Math.round(3*pw_max/4);
+                console.log(`Finding ${n} random words to use between ${l} and ${h} characters`);
+                return `http://api.wordnik.com:80/v4/words.json/randomWords?hasDictionaryDef=true&minDictionaryCount=10&maxDictionaryCount=-1&minLength=${l}&maxLength=${h}&limit=${n}&api_key=a2a73e7b926c924fad7001ca3111acd55af2ffabf50eb4ae5`
+            },
+            passwords:(complexities,words,specials,pw_min,pw_max,suggestions,threshold,infixnum)=>{
+                var pws = [];
+                for(var s=0; s<suggestions; s++){
+                    var r1 = Math.floor(Math.random()*suggestions);
+                    var r2 = Math.floor(Math.random()*suggestions);
+                    var ctype = 'm'; //mixed
+                    var w1 = '', w2 = '';
+                    if(r1==r2) r2=(r2<suggestions-1)?r2+1:r2-1;
+
+                    var pw = '';
+                    if(words) {
+                        w1 = words[r1].word;
+                        w2 = words[r2].word;
+
+                        console.log({r1, r2, w1, w2, w3:w1+w2});
+                        pw=(w1.length+w2.length>pw_max)?w1:''+w1+w2;
+                    }
+                    var pw_parts = pw.split('');
+
+                    var cummulative = 0;
+                    var left = 5;
+                    for(var cn in complexities){
+                        left--;
+                        var c = complexities[cn];
+                        var off;
+                        var switcher = Math.round(Math.random());
+                        switch(c.requirement){
+                            case 'allowed':
+                                off = switcher;
+                                break;
+                            case 'composite':
+                                //if we don't have enough randoms left, enforce complexity, if we have to many, ignore
+                                off = (cummulative+left<threshold)?true:(cummulative<threshold)?switcher:false;
+                                break;
+                            case 'required':
+                                off = false;
+                                break;
+                            case 'notallowed':
+                                off = 1;
+                        }
+                        cummulative+=(off)?0:1;
+
+                        if(!off){
+                            var r3 = Math.floor(Math.random()*pw.length);
+                            var splicer= (infixnum)?(w1.length):r3;
+                            switch(c.type){
+                                case 'lowercase':
+                                  if(pw_parts[r3]) pw_parts[r3] = pw_parts[r3].toLowerCase();
+                                    break;
+                                case 'mixed':
+                                    var r4 = (r3<pw.length+1)?r3+1:r3-1;
+                                    console.log(pw_parts[r4]);
+                                    if(pw_parts[r4]) pw_parts[r4] = pw_parts[r4].toLowerCase();
+                                case 'uppercase':
+                                    if(pw_parts[r3]) pw_parts[r3] = pw_parts[r3].toUpperCase();
+                                    break;
+                                case 'numbers':
+                                    var m1 = Math.floor(Math.random()*300).toString();
+                                    pw_parts.splice(splicer,0,m1);
+                                    break;
+                                case 'special characters':
+                                    var s1 = Math.floor(Math.random()*specials.length);
+                                    console.log('Added Special',specials[s1]);
+                                    pw_parts.splice(splicer,0,specials[s1]);
+                                    break;
+                            }
+                        }else if(off===1){ //make sure upper and lower are enforced
+                            if(c.type=='lowercase') ctype = 'u';
+                            else if(c.type=='uppercase') ctype = 'l';
+                        }
+                    }
+                    pws.push(pw_parts.join(''));
+                    //pws[pw] = { word:pw_parts.join(), complexity:cummulative }
+                }
+                console.log('Passwords are ',pws)
+                return pws;
+            }
+        },
+        methods:{
+            get_words(){
+                fetch(this.get('random_api_url')).then(r => r.json()).then(words => {
+                    console.log('I got words!',words);
+                    this.set({ words: words });
+                });
+            }
+        },
+        oncreate() {
+            this.get_words();
+        }
+    }
+
+
+</script>
