@@ -13,7 +13,7 @@
 -  [ ] https://proandroiddev.com/writing-dsls-in-kotlin-part-1-7f5d2193f277
 
 ## GraphQL
-- [ ] [Best Practices, official](https://graphql.org/learn/best-practices/)
+- [x] [Best Practices, official](https://graphql.org/learn/best-practices/)
 - [x] [3 Reasons Not To](https://blog.hitchhq.com/graphql-3-reasons-not-to-use-it-7715f60cb934) 
 - [ ] [When & When Not to](https://www.partech.nl/nl/publicaties/2020/06/when-and-when-not-to-use-graphql)
 - [ ] [Why and When to](https://dzone.com/articles/why-and-when-to-use-graphql-1)
@@ -24,6 +24,6 @@
 - [ ] [Dive Into ... Part V: Should You](https://marmelab.com/blog/2017/09/08/dive-into-graphql-part-v-should-you-use-graphql.html)
 - [ ] [Apollo Docs - FAQs](https://www.apollographql.com/docs/resources/faq/)
 - [ ] [Schema Do's & Don'ts](https://www.conferencecast.tv/talk-25842-the-dos-and-donts-for-your-schema-and-graphql-operations)
-- [ ] [5 Reasons You shouldn't be](https://blog.logrocket.com/5-reasons-you-shouldnt-be-using-graphql-61c7846e7ed3/)
+- [x] [5 Reasons You shouldn't be](https://blog.logrocket.com/5-reasons-you-shouldnt-be-using-graphql-61c7846e7ed3/)
 
 ## Other
